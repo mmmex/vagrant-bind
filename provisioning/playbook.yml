@@ -15,13 +15,13 @@
       name: chronyd
       state: stopped
       enabled: false
-    tags: ntp
+
   - name: Enable and start ntpd unit
     ansible.builtin.systemd:
       name: ntpd
       state: started
       enabled: true
-    tags: ntp
+
   - name: Set timezone to Europe/Moscow
     command: "timedatectl set-timezone Europe/Moscow"
 
