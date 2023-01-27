@@ -3,11 +3,27 @@
   become: yes
   tasks:
   - name: install packages
-    yum: name={{ item }} state=latest 
-    with_items:
-      - bind
-      - bind-utils
-      - ntp
+    yum:
+      name:
+        - bind
+        - bind-utils
+        - ntp
+      state: latest
+      update_cache: true
+  - name: Stop and disable chronyd
+    ansible.builtin.systemd:
+      name: chronyd
+      state: stopped
+      enabled: false
+    tags: ntp
+  - name: Enable and start ntpd unit
+    ansible.builtin.systemd:
+      name: ntpd
+      state: started
+      enabled: true
+    tags: ntp
+  - name: Set timezone to Europe/Moscow
+    command: "timedatectl set-timezone Europe/Moscow"
 
   - name: copy transferkey to all servers and the client
     copy: src=named.zonetransfer.key dest=/etc/named.zonetransfer.key owner=root group=named mode=0644
@@ -44,7 +60,7 @@
   - name: ensure named is running and enabled
     service: name=named state=restarted enabled=yes
     
-- hosts: client
+- hosts: client,client2
   become: yes
   tasks:
   - name: copy resolv.conf to the client
