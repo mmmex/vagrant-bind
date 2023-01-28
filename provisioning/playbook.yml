@@ -16,13 +16,13 @@
       update_only: true
 
   - name: Stop and disable chronyd
-    ansible.builtin.systemd:
+    systemd:
       name: chronyd
       state: stopped
       enabled: false
 
   - name: Enable and start ntpd unit
-    ansible.builtin.systemd:
+    systemd:
       name: ntpd
       state: started
       enabled: true
@@ -76,11 +76,11 @@
       group: named
       mode: 0670
   - name: ensure named is running and enabled
-    ansible.builtin.systemd:
+    systemd:
       name: named
       state: restarted
       enabled: yes
-  - name: Setsebool for named_zone_t
+  - name: Setsebool for named_write_master_zones
     seboolean:
       name: named_write_master_zones
       state: yes
@@ -118,11 +118,11 @@
       group: named
       mode: 0670
   - name: ensure named is running and enabled
-    ansible.builtin.systemd:
+    systemd:
       name: named
       state: restarted
       enabled: yes
-  - name: Setsebool for named_zone_t
+  - name: Setsebool for named_write_master_zones
     seboolean:
       name: named_write_master_zones
       state: yes
