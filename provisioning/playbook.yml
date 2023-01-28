@@ -10,6 +10,11 @@
         - ntp
       state: latest
       update_cache: true
+  - name: update glibc-common
+    yum:
+      name: glibc-common
+      update_only: true
+
   - name: Stop and disable chronyd
     ansible.builtin.systemd:
       name: chronyd
@@ -75,6 +80,16 @@
       name: named
       state: restarted
       enabled: yes
+  - name: Setsebool for named_zone_t
+    ansible.builtin.command:
+      name: setsebool -P named_write_master_zones 1
+  - name: SElinux the crutch for /etc/named
+    sefcontext:
+      target: "/etc/named(/.*)?"
+      setype: named_zone_t
+      state: present
+  - name: Apply context
+    command: restorecon -R -v /etc/named
 
 - hosts: ns02
   become: yes
@@ -105,6 +120,16 @@
       name: named
       state: restarted
       enabled: yes
+  - name: Setsebool for named_zone_t
+    ansible.builtin.command:
+      name: setsebool -P named_write_master_zones 1
+  - name: SElinux the crutch for /etc/named
+    sefcontext:
+      target: "/etc/named(/.*)?"
+      setype: named_zone_t
+      state: present
+  - name: Apply context
+    command: restorecon -R -v /etc/named
     
 - hosts: client,client2
   become: yes
